@@ -30,7 +30,7 @@ int JohnConway::CountNeighbors(World& world, Point2D point) {
 
   for (row = point.x - 1; row < point.x + 2; row++) {
     for (column = point.y - 1; column < point.y + 2; column++) {
-      if (point.x != 1 || point.y != 1) {
+      if (point.x != row || point.y != column) {
         const Point2D newPoint = Point2D{row, column};
         sumOfNeighbors += (int) world.Get(newPoint);
       }
