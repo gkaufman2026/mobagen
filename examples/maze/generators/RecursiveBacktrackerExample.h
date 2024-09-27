@@ -12,7 +12,9 @@ private:
   std::map<int, std::map<int, bool>> visited;  // naive. not optimal
   Point2D randomStartPoint(World* world);
   std::vector<Point2D> getVisitables(World* w, const Point2D& p);
-  int getVisitableIndex();
+  int getRandomNumber();
+  Color32 finishedColor = Color::Crimson;
+  Color32 traversalColor = Color::Blue;
 
 public:
   RecursiveBacktrackerExample() = default;
