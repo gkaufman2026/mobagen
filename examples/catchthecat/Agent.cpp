@@ -4,6 +4,16 @@
 #include <queue>
 #include "World.h"
 using namespace std;
+std::vector<Point2D> Agent::getVisitedNeighbors(World* w, const Point2D& p) {
+  std::vector deltas = {Point2D::UP, Point2D::DOWN, Point2D::LEFT, Point2D::RIGHT};
+  auto sideOver2 = w->getWorldSideSize() / 2;
+  std::vector<Point2D> neighbors;
+
+  // todo: code this
+
+  return neighbors;
+}
+
 std::vector<Point2D> Agent::generatePath(World* w) {
   unordered_map<Point2D, Point2D> cameFrom;  // to build the flowfield and build the path
   queue<Point2D> frontier;                   // to store next ones to visit
@@ -18,16 +28,27 @@ std::vector<Point2D> Agent::generatePath(World* w) {
 
   while (!frontier.empty()) {
     // get the current from frontier
+    Point2D current = frontier.front();
     // remove the current from frontierset
+    frontierSet.erase(current);
     // mark current as visited
+    visited[current] = true;
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
+    vector<Point2D> neighbors = getVisitedNeighbors(w, current);
     // iterate over the neighs:
     // for every neighbor set the cameFrom
+    for (auto neighbor : neighbors) {
+
+    }
+
     // enqueue the neighbors to frontier and frontierset
+
     // do this up to find a visitable border and break the loop
+
   }
 
   // if the border is not infinity, build the path from border to the cat using the camefrom map
+
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
   return vector<Point2D>();

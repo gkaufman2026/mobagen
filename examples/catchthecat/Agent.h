@@ -10,7 +10,7 @@ public:
   explicit Agent() = default;
 
   virtual Point2D Move(World*) = 0;
-
+  std::vector<Point2D> getVisitedNeighbors(World* w, const Point2D& p);
   std::vector<Point2D> generatePath(World* w);
 };
 
