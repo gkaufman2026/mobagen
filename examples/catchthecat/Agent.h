@@ -14,7 +14,7 @@ public:
   virtual Point2D Move(World*) = 0;
   std::vector<Point2D> getVisitedNeighbors(World* w, const Point2D& p, std::unordered_set<Point2D> &frontierSet, std::unordered_map<Point2D, bool> &visited);
   std::vector<Point2D> generatePath(World* w);
-  bool isCheckPointFound(Point2D check, World* w, std::unordered_set<Point2D> &frontierSet, std::unordered_map<Point2D, bool> &visited);
+  bool isCheckPointFound(Point2D checkSpot, World* w, std::unordered_set<Point2D> &frontierSet, std::unordered_map<Point2D, bool> &visited);
 };
 
 #endif  // AGENT_H
