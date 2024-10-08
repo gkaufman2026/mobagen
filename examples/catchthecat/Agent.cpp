@@ -21,6 +21,7 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   while (!frontier.empty()) {
     Point2D current = frontier.front();
     frontierSet.erase(current);
+    frontier.pop();
     visited[current] = true;
     neighbors = getVisitedNeighbors(w, current, frontierSet, visited);
     for (auto neighbor : neighbors) {
