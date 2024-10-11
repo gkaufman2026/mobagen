@@ -13,14 +13,6 @@
 
 class World : GameObject {
 private:
-  enum PathType {
-    BFS = 0,
-    A_STAR = 1,
-    LENGTH = 2
-  };
-  PathType currentPath = PathType::BFS;
-  std::string pathNames[2] = {"BFS", "A*"};
-
   float timeBetweenAITicks = 1;
   float timeForNextTick = 1;
   bool catTurn = true;
@@ -59,6 +51,16 @@ public:
   explicit World(Engine* pEngine, int mapSideSize, bool isCatTurn, Point2D catPos, std::vector<bool> map);
 
   ~World();
+
+  enum PathType {
+    BFS,
+    A_STAR,
+    // If more path types are created, add above LENGTH
+    LENGTH
+  };
+  PathType currentPath = PathType::BFS;
+  std::string pathNames[2] = {"BFS", "A*"};
+  PathType getCurrentPath() {return currentPath; }
 
   // directions
   static Point2D NE(const Point2D& p);
@@ -115,8 +117,6 @@ public:
     n.push_back(SE(point));
     return n;
   }
-
-  PathType getCurrentPath() {return currentPath; }
 };
 
 #endif  // WORLD_H

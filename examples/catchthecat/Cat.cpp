@@ -3,32 +3,29 @@
 
 Point2D Cat::Move(World* world) {
   std::vector<Point2D> path;
-  if (world->getCurrentPath() == 0) {
+  // Setting the vector based on the maze type
+  if (world->getCurrentPath() == World::BFS) {
     path = generateBFSPath(world);
-  } else if (world->getCurrentPath() == 1){
+  } else if (world->getCurrentPath() == World::A_STAR) {
     path = generateAStarPath(world);
   }
 
   if (!path.empty()) {
-    return path[path.size() - 1];
+    return path.back();
   }
 
-  auto rand = Random::Range(0, 5);
-  auto pos = world->getCat();
-  switch (rand) {
-    case 0:
-      return World::NE(pos);
-    case 1:
-      return World::NW(pos);
-    case 2:
-      return World::E(pos);
-    case 3:
-      return World::W(pos);
-    case 4:
-      return World::SW(pos);
-    case 5:
-      return World::SE(pos);
-    default:
-      throw "random out of range";
+  // Updated random system for cat's movement, Tristan gave me jumping off point in class.
+  int rand = Random::Range(0, 5);
+  Point2D pos = world->getCat();
+  std::vector<Point2D> directions = {World::NE(pos), World::NW(pos), World::E(pos), World::W(pos), World::SE(pos), World::SW(pos)};
+
+  if (world->getContent(directions[rand])) {
+    for (int i = (rand + 1) % directions.size(); i != rand; i = (i + 1) % directions.size()) {
+      if (!world->getContent(directions[i])) {
+        return directions[i];
+      }
+    }
+    return Point2D::INFINITE;
   }
+  return directions[rand];
 }

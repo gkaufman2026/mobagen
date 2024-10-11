@@ -56,7 +56,6 @@ std::vector<Point2D> Agent::generateAStarPath(World* w) {
 
   // bootstrap state
   auto startPos = ASNode(w->getCat());
-  const Point2D endPos = probableExit(startPos.point, w->getWorldSideSize() / 2);
 
   frontier.push(startPos);
   frontierSet.insert(startPos.point);
@@ -82,8 +81,8 @@ std::vector<Point2D> Agent::generateAStarPath(World* w) {
         cameFrom[neighbor] = current.point;
 
         auto newNeighbor = ASNode(neighbor);
-        newNeighbor.heuristic = abs(newNeighbor.point.x - endPos.x) + abs(newNeighbor.point.y - endPos.y);
-        newNeighbor.weight = current.weight;
+        newNeighbor.heuristic = ASNode::calculateHeuristic(startPos.point, worldSize); // done in class
+        newNeighbor.weight = current.weight + 1;
 
         frontier.push(newNeighbor);
         frontierSet.insert(neighbor);
@@ -102,9 +101,9 @@ std::vector<Point2D> Agent::generateAStarPath(World* w) {
   return path;
 }
 
-// Not sure if this counts toward "extra", but created a bool function that returns if the point meets the conditions depending on the frontierSet,
-// visited and world conditions Assumed something like this might be viable in varying maze algorithms and wanted to provide a way that would allow
-// all algorithms to have a universal condition.
+// Not sure if this counts toward "extra", but created a boolean function that returns if the point meets the conditions
+// depending on the frontierSet, visited and world conditions Assumed something like this might be viable
+// in varying maze algorithms and wanted to provide a way that would allow all algorithms to have a universal condition.
 bool Agent::isCheckPointFound(Point2D point, World* w, std::unordered_set<Point2D>& frontierSet, std::unordered_map<Point2D, bool>& visited) {
   return !visited.contains(point) && w->getCat() != point && !frontierSet.contains(point) && !w->getContent(point);
 }
@@ -140,14 +139,4 @@ std::vector<Point2D> Agent::getVisitedNeighbors(World* w, const Point2D& p, unor
     }
   }
   return neighbors;
-}
-
-Point2D Agent::probableExit(const Point2D& p, int sideSize) {
-  const int halfSize = sideSize / 2;
-  if (p.x > p.y) {
-    return {halfSize * (p.x > 0 ? 1 : -1), p.y};
-  } else if (p.x < p.y) {
-    return {p.x, halfSize * (p.y > 0 ? 1 : -1)};
-  }
-  return {0, 0};
 }

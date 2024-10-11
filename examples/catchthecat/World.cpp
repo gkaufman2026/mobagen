@@ -156,10 +156,27 @@ void World::OnGui(ImGuiContext* context) {
     isSimulating = false;
   }
 
+  ImGui::NewLine();
+
   // Added option to switch between BFS & A*
   ImGui::Text("Maze Type: %s", pathNames[currentPath].c_str());
-  if (ImGui::Button("Switch Maze Type")) {
+
+  // Implemented visual change in UI button to notify user that button is no longer viable when playing
+  if (isSimulating) {
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75F, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.75F, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.75F, 0.0f, 0.0f, 1.0f));
+  }
+
+  // Switching between Maze Type, if more types were added, LENGTH would be updated as long as done prior to it
+  // Would've done it differently if C++ allowed enum length/size like C# does
+  if (ImGui::Button("Switch Maze Type") && !isSimulating) {
     currentPath = static_cast<PathType>((static_cast<int>(currentPath) + 1) % LENGTH);
+  }
+
+  // Updates the button's color, has to be AFTER button is created
+  if (isSimulating) {
+    ImGui::PopStyleColor(3);
   }
 
   ImGui::End();
