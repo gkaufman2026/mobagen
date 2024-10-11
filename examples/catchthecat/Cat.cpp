@@ -1,12 +1,18 @@
 #include "Cat.h"
 #include "World.h"
-#include <stdexcept>
 
 Point2D Cat::Move(World* world) {
-  std::vector<Point2D> path = generatePath(world);
+  std::vector<Point2D> path;
+  if (world->getCurrentPath() == 0) {
+    path = generateBFSPath(world);
+  } else if (world->getCurrentPath() == 1){
+    path = generateAStarPath(world);
+  }
+
   if (!path.empty()) {
     return path[path.size() - 1];
   }
+
   auto rand = Random::Range(0, 5);
   auto pos = world->getCat();
   switch (rand) {

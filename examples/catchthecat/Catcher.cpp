@@ -3,7 +3,13 @@
 
 Point2D Catcher::Move(World* world) {
   auto side = world->getWorldSideSize() / 2;
-  std::vector<Point2D> path = generatePath(world);
+  std::vector<Point2D> path;
+  if (world->getCurrentPath() == 0) {
+    path = generateBFSPath(world);
+  } else if (world->getCurrentPath() == 1){
+    path = generateAStarPath(world);
+  }
+
   if (!path.empty()) { return path[0]; }
 
   for (;;) {

@@ -155,6 +155,13 @@ void World::OnGui(ImGuiContext* context) {
   if (ImGui::Button("Pause")) {
     isSimulating = false;
   }
+
+  // Added option to switch between BFS & A*
+  ImGui::Text("Maze Type: %s", pathNames[currentPath].c_str());
+  if (ImGui::Button("Switch Maze Type")) {
+    currentPath = (PathType)(((int)currentPath + 1) % (PathType::A_STAR + 1));
+  }
+
   ImGui::End();
 
   if ((catcherWon || catWon)) {

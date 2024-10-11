@@ -30,6 +30,7 @@ public:
 
   // for unordered set
   size_t operator()(const Point2D& p) const noexcept { return ((uint64_t)p.x) << 32 | (uint64_t)p.y; };
+  bool operator==(int worldSize) const { return (abs(x) == worldSize || abs(y) == worldSize); }
 
   uint64_t hash(Point2D const& p) const noexcept { return ((uint64_t)p.x) << 32 | (uint64_t)p.y; }
 };

@@ -9,9 +9,17 @@
 #include <bitset>
 #include <iostream>
 #include <vector>
+#include <string>
 
 class World : GameObject {
 private:
+  enum PathType {
+    BFS = 0,
+    A_STAR = 1,
+  };
+  PathType currentPath = PathType::BFS;
+  std::string pathNames[2] = {"BFS", "A*"};
+
   float timeBetweenAITicks = 1;
   float timeForNextTick = 1;
   bool catTurn = true;
@@ -106,6 +114,8 @@ public:
     n.push_back(SE(point));
     return n;
   }
+
+  PathType getCurrentPath() {return currentPath; }
 };
 
 #endif  // WORLD_H

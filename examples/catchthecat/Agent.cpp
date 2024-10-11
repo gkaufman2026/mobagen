@@ -5,7 +5,7 @@
 #include "World.h"
 using namespace std;
 
-std::vector<Point2D> Agent::generatePath(World* w) {
+std::vector<Point2D> Agent::generateBFSPath(World* w) {
   unordered_map<Point2D, Point2D> cameFrom;  // to build the flowfield and build the path
   queue<Point2D> frontier;                   // to store next ones to visit
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
@@ -22,8 +22,8 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     frontier.pop();
     frontierSet.erase(current);
 
-    int worldSize = w->getWorldSideSize() / 2;
-    if (abs(current.x) == worldSize || abs(current.y) == worldSize) {
+    const int worldSize = w->getWorldSideSize() / 2;
+    if (current == worldSize) {
       borderExit = current;
       break;
     }
@@ -41,10 +41,6 @@ std::vector<Point2D> Agent::generatePath(World* w) {
 
   vector<Point2D> path;
   if (borderExit != Point2D::INFINITE) {
-    // Ran into issues with previous while loop. Since this code is building the border for the cat, I went researching into alternatives with loops and found "custom" iterator for loops
-    // https://stackoverflow.com/questions/8164567/how-to-make-my-custom-type-to-work-with-range-based-for-loops
-    // Where it gave me an idea to condense the code within the for loop to check that the current != catPos and setting the current by the cameFrom array
-    // And then just adding the current to the path vector
     for (Point2D currentHex = borderExit; currentHex != catPos; currentHex = cameFrom[currentHex]) {
       path.push_back(currentHex);
     }
@@ -52,8 +48,63 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   return path;
 }
 
-// Not sure if this counts toward "extra", but created a bool function that returns if the point meets the conditions depending on the frontierSet, visited and world conditions
-// Assumed something like this might be viable in varying maze algorithms and wanted to provide a way that would allow all algorithms to have a universal condition.
+std::vector<Point2D> Agent::generateAStarPath(World* w) {
+  unordered_map<Point2D, Point2D> cameFrom;  // to build the flowfield and build the path
+  priority_queue<ASNode> frontier;           // to store next ones to visit
+  unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
+  unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element don't exist [] will give you wrong results
+
+  // bootstrap state
+  auto startPos = ASNode(w->getCat());
+  const Point2D endPos = probableExit(startPos.point, w->getWorldSideSize() / 2);
+
+  frontier.push(startPos);
+  frontierSet.insert(startPos.point);
+  Point2D borderExit = Point2D::INFINITE;  // if at the end of the loop we don't find a border, we have to return random points
+
+  while (!frontier.empty()) {
+    const ASNode current = frontier.top();
+    frontier.pop();
+    frontierSet.erase(current.point);
+
+    const int worldSize = w->getWorldSideSize() / 2;
+    // Created operator overload for == inside Point2D to clean up clutter and to make it clear that the point is
+    // being compared to another Point2D (worldSize) rather than calculating each axis' absolute value individually
+    if (current.point == worldSize) {
+      borderExit = current.point;
+      break;
+    }
+
+    visited[current.point] = true;
+    const vector<Point2D> neighbors = getVisitedNeighbors(w, current.point, frontierSet, visited);
+    if (!neighbors.empty()) {
+      for (const auto& neighbor : neighbors) {
+        cameFrom[neighbor] = current.point;
+
+        auto newNeighbor = ASNode(neighbor);
+        newNeighbor.heuristic = abs(newNeighbor.point.x - endPos.x) + abs(newNeighbor.point.y - endPos.y);
+        newNeighbor.weight = current.weight;
+
+        frontier.push(newNeighbor);
+        frontierSet.insert(neighbor);
+      }
+    }
+  }
+
+  vector<Point2D> path;
+  if (borderExit != Point2D::INFINITE) {
+    // Ran into issues with the recommended while loop, so I converted system to be a for loop, where it parses through each of
+    // the borderExits and checks that it isn't the cat's starting position and adds the currentHexagon to the vector
+    for (Point2D currentHex = borderExit; currentHex != startPos.point; currentHex = cameFrom[currentHex]) {
+      path.push_back(currentHex);
+    }
+  }
+  return path;
+}
+
+// Not sure if this counts toward "extra", but created a bool function that returns if the point meets the conditions depending on the frontierSet,
+// visited and world conditions Assumed something like this might be viable in varying maze algorithms and wanted to provide a way that would allow
+// all algorithms to have a universal condition.
 bool Agent::isCheckPointFound(Point2D point, World* w, std::unordered_set<Point2D>& frontierSet, std::unordered_map<Point2D, bool>& visited) {
   return !visited.contains(point) && w->getCat() != point && !frontierSet.contains(point) && !w->getContent(point);
 }
@@ -89,4 +140,14 @@ std::vector<Point2D> Agent::getVisitedNeighbors(World* w, const Point2D& p, unor
     }
   }
   return neighbors;
+}
+
+Point2D Agent::probableExit(const Point2D& p, int sideSize) {
+  const int halfSize = sideSize / 2;
+  if (p.x > p.y) {
+    return {halfSize * (p.x > 0 ? 1 : -1), p.y};
+  } else if (p.x < p.y) {
+    return {p.x, halfSize * (p.y > 0 ? 1 : -1)};
+  }
+  return {0, 0};
 }
