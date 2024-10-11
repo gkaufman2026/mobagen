@@ -159,7 +159,7 @@ void World::OnGui(ImGuiContext* context) {
   // Added option to switch between BFS & A*
   ImGui::Text("Maze Type: %s", pathNames[currentPath].c_str());
   if (ImGui::Button("Switch Maze Type")) {
-    currentPath = (PathType)(((int)currentPath + 1) % (PathType::A_STAR + 1));
+    currentPath = static_cast<PathType>((static_cast<int>(currentPath) + 1) % LENGTH);
   }
 
   ImGui::End();

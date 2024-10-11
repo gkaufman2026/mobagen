@@ -16,6 +16,7 @@ private:
   enum PathType {
     BFS = 0,
     A_STAR = 1,
+    LENGTH = 2
   };
   PathType currentPath = PathType::BFS;
   std::string pathNames[2] = {"BFS", "A*"};
